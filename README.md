@@ -1,2 +1,2 @@
 # Smmplanner-Instagram-
-Smmplanner for instagram
+Smmplanner for instagram , work on recoursia  .
