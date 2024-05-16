@@ -25,6 +25,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
         $controller = new App\Controller\Login(); // Создание экземпляра контроллера для страницы входа.
         $controller->run(); // Выполнение метода run контроллера.
     });
+  ###  dhdhdhdh
 
     $r->addRoute(['GET', 'POST'], '/log_out', function() {
         $controller = new App\Controller\Login(); // Создание экземпляра контроллера для выхода из системы.
