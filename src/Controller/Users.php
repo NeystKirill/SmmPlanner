@@ -6,8 +6,8 @@ class Users
     {
         $view_users =  new \App\View\Users();
         $data = [
-            "title" => "Users" ,
-            "page_name" => "Users here:"
+            "title" => "Users Browsers" ,
+            "page_name" => "Users her e:"
         ] ; 
         $view_users->render($data) ;
     }

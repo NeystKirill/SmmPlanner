@@ -19,4 +19,17 @@ class Users extends \App\View\Main
         <?php
 
     }
+    public function get_users() 
+    {
+        $pdo = \App\Service\DB::get_pdo() ;
+        $pdo->prepare(
+          "
+            SELECT * 
+            FROM `users`
+          "
+          ); 
+        return $stmt->fetch()  ; 
+        
+      
+    }
 }      

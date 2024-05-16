@@ -45,7 +45,9 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
         $controller->run(); // Выполнение метода run контроллера.
 
         });
-    } elseif (isset($_SESSION['auth']) && $_SERVER['REQUEST_URI'] == '/users' && !$_SESSION['auth']['privilege'] == 1)
+    }
+    # в случае ошибки выдавать sorryBug
+    elseif (isset($_SESSION['auth']) && $_SERVER['REQUEST_URI'] == '/users' && !$_SESSION['auth']['privilege'] == 1)
     {
         $bug = new App\View\SorryBug ; 
         $data = [
