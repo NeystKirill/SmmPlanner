@@ -168,4 +168,52 @@ class Main extends \App\View\Base
 
             <?php 
         }
+      
+      
+      
+    protected function table()   
+    {
+      ?>
+      <div class="block">
+                                <div class="block-header">
+                                    <div class="block-options">
+                           <div class="block-content">
+                                    <table class="table table-striped">
+                                      
+                             </div>
+                            </div  >
+      <div class= "">
+        
+        </div>
+
+
+      <?php
+    }
+        
+    private function body_of_table() 
+    {
+      return [
+      'id' => [
+        'label' => '#', 
+        'class' => 'text-aling' , 
+        'style' => 'widht: 50px'
+         ]  ,
+         'email' => [
+           'label' => 'users email' , 
+           'class' => '' , 
+           'style' => ''
+           ] , 
+         'name' => [
+           'label' => 'users name', 
+           'class' => '' , 
+           'style' => ' ' , 
+             ] ,
+          'privilege' => [
+             'label' => 'users privilege', 
+             'class' => '' , 
+             'style' => '' ,
+            ]
+            
+        ] ; 
+    }
 }

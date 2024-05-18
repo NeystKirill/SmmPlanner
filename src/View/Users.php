@@ -15,21 +15,13 @@ class Users extends \App\View\Main
                 </h1>
             </div>
         </div>
+        <div class="content">
+          <?= $this->table(); ?>
+          
+          </div> 
+        
     </main>
         <?php
 
     }
-    public function get_users() 
-    {
-        $pdo = \App\Service\DB::get_pdo() ;
-        $pdo->prepare(
-          "
-            SELECT * 
-            FROM `users`
-          "
-          ); 
-        return $stmt->fetch()  ; 
-        
-      
-    }
-}      
+}   

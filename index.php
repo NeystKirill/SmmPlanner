@@ -32,7 +32,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
         $controller->run_logout(); // Выполнение метода run_logout контроллера для выхода.
     });
     $r->addRoute('GET', '/insta', function() {
-        $controller = new App\Controller\Insta(); // Создание экземпляра контроллера для выхода из системы.
+        $controller = new App\Controller\Insta(); // Создание экземпляра контроллера для выхода из системы
         $controller->run(); // Выполнение метода run_logout контроллера для выхода.
     });
     $r->addRoute('GET', '/tasks', function() {
