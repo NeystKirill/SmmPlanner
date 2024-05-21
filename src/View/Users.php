@@ -16,12 +16,39 @@ class Users extends \App\View\Main
             </div>
         </div>
         <div class="content">
-          <?= $this->table(); ?>
+        <a class="btn btn-info push-15-r push-10 push-10-t pull-right" href="users/add"><i class="fa fa-plus"></i></a>
+          <?= $this->table( $this->columns_of_table() , $i_am_batman['users']); ?>
           
           </div> 
         
     </main>
         <?php
 
+    }
+    private function columns_of_table() 
+    {
+      return [
+      'id' => [
+        'label' => '#', 
+        'class' => 'text-aling' , 
+        'style' => 'widht: 50px'
+         ]  ,
+        'email' => [
+           'label' => 'users email' , 
+           'class' => '' , 
+           'style' => ''
+           ] , 
+        'name' => [
+           'label' => 'users name', 
+           'class' => '' , 
+           'style' => ' ' , 
+             ] ,
+        'privilege' => [
+             'label' => 'users privilege', 
+             'class' => '' , 
+             'style' => '' ,
+            ]
+            
+        ] ; 
     }
 }   

@@ -46,6 +46,12 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
         $controller->run(); // Выполнение метода run контроллера.
 
         });
+        $r->addRoute('GET', '/users/add', function() {
+            $controller = new App\Controller\Users(); //
+            $controller->runAdd(); // Выполнение метода run контроллера.
+    
+            });
+
     }
     # в случае ошибки выдавать sorryBug
     elseif (isset($_SESSION['auth']) && $_SERVER['REQUEST_URI'] == '/users' && !$_SESSION['auth']['privilege'] == 1)

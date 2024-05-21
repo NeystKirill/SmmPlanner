@@ -69,7 +69,7 @@ class Main extends \App\View\Base
                     <li>
                         <div class="btn-group">
                             <button class="btn btn-default btn-image dropdown-toggle" data-toggle="dropdown" type="button" aria-expanded="false">
-                                <img src="oneui/assets/img/avatars/avatar10.jpg" alt="Avatar">
+                                <img src="/oneui/assets/img/avatars/avatar10.jpg" alt="Avatar">
                                 <span class="caret"></span>
                             </button>
                             <ul class="dropdown-menu dropdown-menu-right">
@@ -171,49 +171,33 @@ class Main extends \App\View\Base
       
       
       
-    protected function table()   
-    {
+    protected function table(array $columns , array $i_am_batman)    
+    {   
       ?>
       <div class="block">
-                                <div class="block-header">
-                                    <div class="block-options">
-                           <div class="block-content">
-                                    <table class="table table-striped">
-                                      
-                             </div>
-                            </div  >
-      <div class= "">
-        
-        </div>
+        <table class="table table-bordered table-striped table-hover">
+            <thead>
+            <tr>
+                <?php foreach ($columns as $column) :?>
+                    <th class = "<?= $column['class']?>" style = "<?= $column['style']?>"><?= $column["label"] ?></th>
+                <?php endforeach;?>
+            </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <?php foreach ($i_am_batman as $point) :
+                        foreach ($point as $data):?>
+                        <th><?= $data ?></th>
+                    <?php endforeach;
+                    endforeach;?>
+                </tr>
+            </tbody>
+        </table>
+    </div>
 
 
       <?php
     }
         
-    private function body_of_table() 
-    {
-      return [
-      'id' => [
-        'label' => '#', 
-        'class' => 'text-aling' , 
-        'style' => 'widht: 50px'
-         ]  ,
-         'email' => [
-           'label' => 'users email' , 
-           'class' => '' , 
-           'style' => ''
-           ] , 
-         'name' => [
-           'label' => 'users name', 
-           'class' => '' , 
-           'style' => ' ' , 
-             ] ,
-          'privilege' => [
-             'label' => 'users privilege', 
-             'class' => '' , 
-             'style' => '' ,
-            ]
-            
-        ] ; 
-    }
+ 
 }
