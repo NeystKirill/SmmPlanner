@@ -15,13 +15,10 @@ class FormAppear extends \App\View\Main
                             <div class="block-content bg-primary-op text-center overflow-hidden">
                             <div class="push-30-t push animated fadeInDown">
                         <?php
-                        // Проверяем наличие фото
                         if (isset($i_am_batman['user']['icon']) && !empty($i_am_batman['user']['icon'])) {
-                            // Преобразуем фото в корректный base64 формат
                             $photo_base64 = base64_encode($i_am_batman['user']['icon']);
                             $photo_src = 'data:image/jpeg;base64,' . $photo_base64;
                         } else {
-                            // Используем дефолтное фото, если пользовательского фото нет
                             $photo_src = '/oneui/assets/img/avatars/avatar10.jpg';
                         }
                         ?>

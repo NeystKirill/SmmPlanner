@@ -1,24 +1,27 @@
 <?php
-
-session_start(); // Старт сессии. Необходим для работы с переменными сессии.
-require 'vendor/autoload.php'; // Подключение автозагрузчика классов Composer.
+/**
+ * Реализация данного проэкта не закончена , это лишь первая версия того что я хотел бы сделать , тут еще надо добавить очень много разных фич ; 
+ */
+session_start(); 
+require 'vendor/autoload.php'; 
 
 // Проверка наличия данных аутентификации пользователя. Если нет данных и текущий URL не соответствует странице входа, перенаправляем пользователя на страницу входа.
 if (!isset($_SESSION['auth']) && $_SERVER['REQUEST_URI'] !== '/log_in') {
-    header('Location: /log_in'); // Перенаправление на страницу входа.
-    return; // Остановка дальнейшего выполнения скрипта.
+    header('Location: /log_in'); 
+    return;
 }
 
 // Создание диспетчера маршрутов с использованием библиотеки FastRoute.
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
     
+    //  Login/Logout and main routes:
     $r->addRoute(['GET', 'POST'], '/log_in', fn() => (new App\Controller\Login())->run());
 
     $r->addRoute(['GET', 'POST'], '/log_out', fn() => (new App\Controller\Login())->run_logout());
 
     $r->addRoute(['GET', 'POST'], '/',fn() => (new App\Controller\Main())->run());
 
-    # $r->addRoute(['GET', 'POST'], '/sing_up', fn() => (new App\Controller\SingUp())->run());
+    // Insta accounts routes:
     $r->addRoute(['GET' , 'POST'], '/insta', fn() => (new App\Controller\Insta())->run());
 
     $r->addRoute(['GET' , 'POST'], '/insta/add', fn() => (new App\Controller\Insta())->runAdd());
@@ -27,6 +30,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
     $r->addRoute(['GET' , 'POST'], '/insta/delete', fn() => (new App\Controller\Insta())->runDelete($_SESSION['auth']['privilege']));
     
+    // Tasks routes : 
     $r->addRoute(['GET' , 'POST'], '/tasks', fn() => (new App\Controller\Tasks())->run());
 
     $r->addRoute(['GET' , 'POST'], '/tasks/add', fn() => (new App\Controller\Tasks())->runAdd());
@@ -35,6 +39,7 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
     $r->addRoute(['GET' , 'POST'], '/tasks/delete', fn() => (new App\Controller\Tasks())->runDelete($_SESSION['auth']['privilege']));
 
+    // Profile routes :
     $r->addRoute(['GET' , 'POST'], '/profile', fn() => (new App\Controller\Profile())->run());
 
     $r->addRoute(['GET' , 'POST'], '/profile/password', fn() => (new App\Controller\Profile())->runChangePass());
@@ -43,7 +48,6 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
 
     $r->addRoute(['GET' , 'POST'], '/profile/delete', fn() => (new App\Controller\Profile())->runDelete());
 
-    //$r->addRoute(['GET' , 'POST'], '/insta/change', fn() => (new App\Controller\Insta())->runChange());
 
     if (isset($_SESSION['auth']) && $_SESSION['auth']['privilege'] == 1)
     {
@@ -55,12 +59,6 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
         $r->addRoute(['GET' , 'POST'], '/users/change', fn() => (new App\Controller\Users())->runChange());
 
         $r->addRoute(['GET' , 'POST'], '/users/delete' , fn() => (new App\Controller\Users())->runDelete());
-
-        // Insta accounts routes:
-
-
-        // Tasks routes : 
-
     } elseif (isset($_SESSION['auth']) && $_SERVER['REQUEST_URI'] == '/users')
     {
         $bug = new App\Service\SorryBug ; 
@@ -70,9 +68,6 @@ $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
         ] ;
         $bug->render($data);
     }
-    
-
-   
 });
 
 // Получение метода и URI текущего запроса
@@ -89,16 +84,16 @@ $uri = rawurldecode($uri);
 $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
 switch ($routeInfo[0]) {
     case FastRoute\Dispatcher::NOT_FOUND:
-        echo '404 Not Found'; // Вывод сообщения о том, что страница не найдена.
+        echo '404 Not Found'; 
         break;
     case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
         $allowedMethods = $routeInfo[1];
-        echo '405 Method Not Allowed'; // Вывод сообщения о том, что метод не разрешен.
+        echo '405 Method Not Allowed';
         break;
     case FastRoute\Dispatcher::FOUND:
         $handler = $routeInfo[1];
         $vars = $routeInfo[2];
-        $handler($vars); // Выполнение обработчика маршрута с переменными.
+        $handler($vars); 
         break;
 }
 

@@ -137,7 +137,10 @@ class Tasks
             // Проверка запроса и валидации данных
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validator->check($_POST)) {
                 $photoContent = null;
-
+                if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) 
+                {
+                    die('CSRF token validation failed');
+                }
                 // Проверка и обработка загруженного файла фотографии
                 if (isset($_FILES['new-Photo']) && $_FILES['new-Photo']['error'] === UPLOAD_ERR_OK) {
                     $photoTmpPath = $_FILES['new-Photo']['tmp_name'];

@@ -7,28 +7,27 @@ class FormDelete extends \App\View\Main
     protected function content(array $i_am_batman) 
     { 
         ?>
-    <main id="main-container" >
-    <div class="content bg-gray-lighter">
-        <div class="row items-push">
-            <div class="col-sm-11">
-                <h1 class="page-heading text-center">
-                   Are you sure you want to delete - <?= $i_am_batman['data']['username']?> ? 
-                </h1>
+        <main id="main-container" >
+            <div class="content bg-gray-lighter">
+                <div class="row items-push">
+                    <div class="col-sm-11">
+                        <h1 class="page-heading text-center">
+                        Are you sure you want to delete - <?= $i_am_batman['data']['username']?> ? 
+                        </h1>
+                    </div>
+                </div>
             </div>
-        </div>
-    </div>
-    <form class="col-sm-3 text-center" style = "margin-left: 72rem" method = "post" action = "<?= $i_am_batman['action_to']['delete']?>">
-    <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
-   <input type="hidden" name="id" value="<?= $i_am_batman['data']['id']?>" />
-        <div class="alert alert-danger alert-dismissable text-center">
-            <h3 class="font-w300 push-15">Warning</h3>
-            <h4><p>If you delete a user , <a class="alert-link" href="javascript:void(0)">you wont turn his back</a>!</p></h4>
-            <button class = "btn btn-sm btn-danger" type = "submit">Delete</button>
-            <a class ="btn btn-sm btn-primary" href = "<?= $i_am_batman['action_to']['cancel'] ?>">Cancel</a>
-        </div>
-    </form>
-</main>
-
+            <form class="col-sm-3 text-center" style = "margin-left: 72rem" method = "post" action = "<?= $i_am_batman['action_to']['delete']?>">
+                <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
+                <input type="hidden" name="id" value="<?= $i_am_batman['data']['id']?>" />
+                <div class="alert alert-danger alert-dismissable text-center">
+                    <h3 class="font-w300 push-15">Warning</h3>
+                    <h4><p>If you delete a user , <a class="alert-link" href="javascript:void(0)">you wont turn his back</a>!</p></h4>
+                    <button class = "btn btn-sm btn-danger" type = "submit">Delete</button>
+                    <a class ="btn btn-sm btn-primary" href = "<?= $i_am_batman['action_to']['cancel'] ?>">Cancel</a>
+                </div>
+            </form>
+        </main>
         <?php
     }
 }

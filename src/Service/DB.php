@@ -2,12 +2,17 @@
 
 namespace App\Service;
 
-use PDO;
+use PDO ;
 
 class DB 
 {
     private static $pdo = null;
-    public static function getPdo()
+    /**
+     * Возвращает экземпляр PDO для работы с базой данных.
+     * 
+     * @return PDO Возвращает объект PDO для взаимодействия с базой данных.
+     */
+    public static function getPdo(): PDO
     {
         if (self::$pdo === null) {
             $host = '127.0.0.1';
@@ -26,7 +31,13 @@ class DB
 
         return self::$pdo;
     }
-    public static function getData(int $current_user_id)
+     /**
+     * Получает данные пользователя из базы данных.
+     * 
+     * @param int $current_user_id ID пользователя для получения данных.
+     * @return array Возвращает массив, содержащий данные пользователя, его Instagram-аккаунты, задачи и пароль.
+     */
+    public static function getData(int $current_user_id): array 
     {
         $bug = new \App\Service\SorryBug();
         $pdo = self::getPdo();
@@ -81,6 +92,12 @@ class DB
             'pass' => $pass
         ];
     }
+    /**
+     * Обновляет создателя для Instagram-аккаунтов и задач в базе данных.
+     *
+     * @param string $new_username Новое имя пользователя, на которое обновляются записи.
+     * @param string $last_username Старое имя пользователя, которое заменяется.
+     */
     public static function updateCreators(string $new_username, string $last_username)
     {
         $bug = new \App\Service\SorryBug();

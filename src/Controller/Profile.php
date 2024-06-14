@@ -32,9 +32,11 @@ class Profile
         $data = \App\Service\DB::getData( $current_user_id) ; 
         try {
             $validator = $this->getValidator(true);
+            
             // Проверка текущего пароля
-            if ($data['pass']['password'] == sha1($_POST['current-Password'])) 
+            if (password_verify($_POST['current-Password'], $data['pass']['password']) && isset($_POST['current-Password'])) 
             {
+                $passwordHash = password_hash($_POST['new-Password'], PASSWORD_DEFAULT);
                 // Проверка запроса и проверка валидации данных
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validator->check($_POST)) {
                     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) 
@@ -47,14 +49,14 @@ class Profile
                         WHERE `id` = :id
                     ");
                     $stmt->execute([
-                        ':password' => sha1($_POST['new-Password']),
+                        ':password' => $passwordHash,
                         ':id' => $_SESSION['auth']['id']
                     ]);
 
                     header('Location: /profile');
                     return;
                 }
-            } else 
+            } else
             {
                 $message_pass = 'Current password is wrong!';
             }
@@ -92,7 +94,7 @@ class Profile
     
         try {
             $validator = $this->getValidator(false);
-            if ($data['pass']['password'] == sha1($_POST['current-Password'])) {
+            if (password_verify($_POST['current-Password'], $data['pass']['password'])) {
             // Проверка запроса и проверка валидации данных
                 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validator->check($_POST)) {
                     if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) 

@@ -3,9 +3,7 @@ namespace App\Controller ;
 class Insta 
 {
      /**
-     * Метод для получения валидатора.
-     * 
-     * @return \App\Service\Validator
+     * Метод для отображения подключенных аккаунтов .
      */
     public function run(): void 
     {
@@ -30,9 +28,13 @@ class Insta
         ] ; 
         $view_accounts->render($data) ;
     }
+     /**
+     * Метод для добавления инстаграм аккаунта .
+     */
     public function runAdd(): void 
     {
         $validator = $this->getValidator();
+        $passwordHash = password_hash($_POST['new-Password'], PASSWORD_DEFAULT);
         if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validator->check($_POST))
         { 
             if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) 
@@ -41,20 +43,21 @@ class Insta
             }
             $db = \App\Service\DB::getPdo();
             $stmt = $db->prepare("
-                INSERT INTO `insta-accounts` (`username` , `password`)
-                VALUES  (:username , :password)
+                INSERT INTO `insta-accounts` (`username` , `password` , `creator`)
+                VALUES  (:username , :password , :creator)
                 ");
             try {
                 $stmt->execute([
-                    'username' => $_POST['new-Name'],
-                    'password' => sha1($_POST['new-Password']),
+                    ':username' => $_POST['new-Name'],
+                    ':password' => $passwordHash,
+                    ':creator' => $_SESSION['auth']['username']
                 ]);  
                 header('Location: /insta'); 
                 return;
             } catch (\PDOException $e) {
-                error_log("Database error: " . $e->getMessage());
-                $this->renderError("An error occurred while adding the account." , '/insta/add') ; 
-                } 
+               error_log("Database error: " . $e->getMessage());
+               $this->renderError("An error occurred while adding the account." , '/insta/add') ; 
+            } 
         } 
 
         $adding_account = new \App\View\InstaAccounts\Form(); 
@@ -69,6 +72,9 @@ class Insta
 
         $adding_account->render($data);
     }
+    /**
+     * Метод для изменения данных аккаунта.
+     */ 
     public function runChange($privilege): void  
     {
         if (($privilege == 1 && $_GET['creator'] != $_SESSION['auth']['username']) || $_GET['creator'] == $_SESSION['auth']['username'])
@@ -97,6 +103,7 @@ class Insta
                 $this->renderError('We can\'t find that account!' , '/insta') ; 
             }
             $validator = $this->getValidator(true);
+            $passwordHash = password_hash($_POST['new-Password'], PASSWORD_DEFAULT);
             if ($_SERVER['REQUEST_METHOD'] === 'POST' && $validator->check($_POST)) 
             {
                 if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) 
@@ -126,7 +133,7 @@ class Insta
                     ) ;
                     $stmt->execute([
                         ':username' => $_POST['new-Name'],
-                        ':password' => sha1($_POST['new-Password']),
+                        ':password' => $passwordHash,
                         ':id' => $_GET['id']
                     ]) ;
                     header('Location: /insta') ;
@@ -157,9 +164,13 @@ class Insta
         return ; 
     }   
     }
+    /**
+     * Метод для удаления данных пользователя.
+     */ 
+
     public function runDelete($privilege): void 
     {
-        if (($privilege == 1 && $_GET['creator'] != $_SESSION['auth']['username']) || $_GET['creator'] == $_SESSION['auth']['username'])
+        if (( $_GET['creator'] != $_SESSION['auth']['username']) && $privilege == 1 || $_GET['creator'] == $_SESSION['auth']['username'] )
         {
         $pdo = \App\Service\DB::getPdo(); 
         try 
