@@ -1,5 +1,5 @@
 <?php 
-namespace App\View ; 
+namespace App\Service ; 
 class SorryBug extends \App\View\Main 
 {
     protected function content(array $i_am_batman) 
@@ -11,7 +11,7 @@ class SorryBug extends \App\View\Main
             <div class="col-sm-12">
                 <h1 class="page-heading">
                     <i class="si si-close danger" aria-hidden="true">  <?= $i_am_batman["problem"] ?></i>
-                    <button onclick="window.location.href='/'" style="background-color: red; color: white; padding: 10px 20px; margin-left: 40px ; border: none; cursor: pointer;text-align: center;">
+                    <button onclick="window.location.href='<?= $i_am_batman['href']?>'" style="background-color: red; color: white; padding: 10px 20px; margin-left: 40px ; border: none; cursor: pointer;text-align: center;">
                     <i class = "si si-logout" style = "margin-right: 10px;"></i>Turn Back
                 </button>
                 </h1>

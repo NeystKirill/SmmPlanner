@@ -11,54 +11,62 @@ if (!isset($_SESSION['auth']) && $_SERVER['REQUEST_URI'] !== '/log_in') {
 
 // Создание диспетчера маршрутов с использованием библиотеки FastRoute.
 $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-    // Определение маршрутов для приложения
-    $r->addRoute(['GET', 'POST'], '/', function() {
-        $main_controller = new \App\Controller\Main(); // Создание экземпляра контроллера для главной страницы.
-        $main_controller->run(); // Выполнение метода run контроллера.
-    });
+    
+    $r->addRoute(['GET', 'POST'], '/log_in', fn() => (new App\Controller\Login())->run());
 
-    $r->addRoute(['GET', 'POST'], '/sing_up', function() {
-      
-    });
+    $r->addRoute(['GET', 'POST'], '/log_out', fn() => (new App\Controller\Login())->run_logout());
 
-    $r->addRoute(['GET', 'POST'], '/log_in', function() {
-        $controller = new App\Controller\Login(); // Создание экземпляра контроллера для страницы входа.
-        $controller->run(); // Выполнение метода run контроллера.
-    });
-  ###  dhdhdhdh
+    $r->addRoute(['GET', 'POST'], '/',fn() => (new App\Controller\Main())->run());
 
-    $r->addRoute(['GET', 'POST'], '/log_out', function() {
-        $controller = new App\Controller\Login(); // Создание экземпляра контроллера для выхода из системы.
-        $controller->run_logout(); // Выполнение метода run_logout контроллера для выхода.
-    });
-    $r->addRoute('GET', '/insta', function() {
-        $controller = new App\Controller\Insta(); // Создание экземпляра контроллера для выхода из системы
-        $controller->run(); // Выполнение метода run_logout контроллера для выхода.
-    });
-    $r->addRoute('GET', '/tasks', function() {
-        $controller = new App\Controller\Tasks(); // Создание экземпляра контроллера для выхода из системы.
-        $controller->run(); // Выполнение метода run_logout контроллера для выхода.
-    });
+    # $r->addRoute(['GET', 'POST'], '/sing_up', fn() => (new App\Controller\SingUp())->run());
+    $r->addRoute(['GET' , 'POST'], '/insta', fn() => (new App\Controller\Insta())->run());
+
+    $r->addRoute(['GET' , 'POST'], '/insta/add', fn() => (new App\Controller\Insta())->runAdd());
+
+    $r->addRoute(['GET' , 'POST'], '/insta/change', fn() => (new App\Controller\Insta())->runChange($_SESSION['auth']['privilege']));
+
+    $r->addRoute(['GET' , 'POST'], '/insta/delete', fn() => (new App\Controller\Insta())->runDelete($_SESSION['auth']['privilege']));
+    
+    $r->addRoute(['GET' , 'POST'], '/tasks', fn() => (new App\Controller\Tasks())->run());
+
+    $r->addRoute(['GET' , 'POST'], '/tasks/add', fn() => (new App\Controller\Tasks())->runAdd());
+
+    $r->addRoute(['GET' , 'POST'], '/tasks/change', fn() => (new App\Controller\Tasks())->runChange($_SESSION['auth']['privilege']));
+
+    $r->addRoute(['GET' , 'POST'], '/tasks/delete', fn() => (new App\Controller\Tasks())->runDelete($_SESSION['auth']['privilege']));
+
+    $r->addRoute(['GET' , 'POST'], '/profile', fn() => (new App\Controller\Profile())->run());
+
+    $r->addRoute(['GET' , 'POST'], '/profile/password', fn() => (new App\Controller\Profile())->runChangePass());
+
+    $r->addRoute(['GET' , 'POST'], '/profile/appear', fn() => (new App\Controller\Profile())->runChangeAppear());
+
+    $r->addRoute(['GET' , 'POST'], '/profile/delete', fn() => (new App\Controller\Profile())->runDelete());
+
+    //$r->addRoute(['GET' , 'POST'], '/insta/change', fn() => (new App\Controller\Insta())->runChange());
+
     if (isset($_SESSION['auth']) && $_SESSION['auth']['privilege'] == 1)
     {
-        $r->addRoute('GET', '/users', function() {
-        $controller = new App\Controller\Users(); //
-        $controller->run(); // Выполнение метода run контроллера.
+        // Users routes : 
+        $r->addRoute('GET', '/users', fn() => (new App\Controller\Users())->run());
 
-        });
-        $r->addRoute('GET', '/users/add', function() {
-            $controller = new App\Controller\Users(); //
-            $controller->runAdd(); // Выполнение метода run контроллера.
-    
-            });
+        $r->addRoute(['GET' , 'POST'], '/users/add', fn() => (new App\Controller\Users())->runAdd());
 
-    }
-    # в случае ошибки выдавать sorryBug
-    elseif (isset($_SESSION['auth']) && $_SERVER['REQUEST_URI'] == '/users' && !$_SESSION['auth']['privilege'] == 1)
+        $r->addRoute(['GET' , 'POST'], '/users/change', fn() => (new App\Controller\Users())->runChange());
+
+        $r->addRoute(['GET' , 'POST'], '/users/delete' , fn() => (new App\Controller\Users())->runDelete());
+
+        // Insta accounts routes:
+
+
+        // Tasks routes : 
+
+    } elseif (isset($_SESSION['auth']) && $_SERVER['REQUEST_URI'] == '/users')
     {
-        $bug = new App\View\SorryBug ; 
+        $bug = new App\Service\SorryBug ; 
         $data = [
-            'problem' => 'Sorry but you dont have access to this page!'
+            'problem' => 'Sorry but you dont have access to this page!' ,
+            'href' => '/' 
         ] ;
         $bug->render($data);
     }
@@ -93,4 +101,4 @@ switch ($routeInfo[0]) {
         $handler($vars); // Выполнение обработчика маршрута с переменными.
         break;
 }
-?>
+

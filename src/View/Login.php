@@ -19,11 +19,11 @@ class Login extends \App\View\Base
                                     </div>
                                     <!-- END Login Title -->
                                     <?php 
-                                    if (isset($i_am_batman['messange'])): ?>
+                                    if (isset($i_am_batman['message'])): ?>
                                         <div class="alert alert-warning alert-dismissable">
                                         <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
                                         <h3 class="font-w300 push-15">Warning</h3>
-                                        <p><?= $i_am_batman['messange'] ?><a class="alert-link" href="javascript:void(0)"></a></p>
+                                        <p><?= $i_am_batman['message'] ?><a class="alert-link" href="javascript:void(0)"></a></p>
                                         </div>
                                     <?php endif; ?>
                                     
@@ -34,6 +34,7 @@ class Login extends \App\View\Base
                                     <!-- For more examples you can check out https://github.com/jzaefferer/jquery-validation -->
                                     <form class="js-validation-login form-horizontal push-50-t" action="/log_in" method="post">
                                         <div class="form-group">
+                                        <input type="hidden" name="csrf_token" value="<?= $_SESSION['csrf_token']; ?>">
                                             <div class="col-xs-12">
                                                 <div class="form-material form-material-primary floating">
                                                     <input class="form-control" type="text" id="login-email" name="login-email">
@@ -45,6 +46,7 @@ class Login extends \App\View\Base
                                             <div class="col-xs-12">
                                                 <div class="form-material form-material-primary floating">
                                                     <input class="form-control" type="password" id="login-password" name="login-password">
+                                                 
                                                     <label for="login-password">Password</label>
                                                 </div>
                                             </div>
