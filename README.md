@@ -9,10 +9,7 @@ SmmPlanner is a social media management dashboard designed to streamline the pro
 - [Requirements](#requirements)
 - [Installation](#installation)
 - [Configuration](#configuration)
-- [Usage](#usage)
-- [Project Structure](#project-structure)
-- [Contribution](#contribution)
-- [License](#license)
+
 
 ## Description
 
