@@ -1,0 +1,187 @@
+{% extends 'layouts/app.twig' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+
+<div class="stats-grid">
+    <div class="stat-card">
+        <div class="stat-icon"><i class="fas fa-edit"></i></div>
+        <div class="stat-value">{{ postStats.total ?? 0 }}</div>
+        <div class="stat-label">Total Posts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(99,214,142,0.12);color:#22c55e"><i class="fas fa-check-circle"></i></div>
+        <div class="stat-value">{{ postStats.published ?? 0 }}</div>
+        <div class="stat-label">Published</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(251,191,36,0.12);color:#f59e0b"><i class="fas fa-clock"></i></div>
+        <div class="stat-value">{{ postStats.scheduled ?? 0 }}</div>
+        <div class="stat-label">Scheduled</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(168,85,247,0.12);color:#a855f7"><i class="fas fa-users"></i></div>
+        <div class="stat-value">{{ totalFollowers|number_format }}</div>
+        <div class="stat-label">Total Followers</div>
+    </div>
+</div>
+
+<div class="grid-2" style="gap:24px;margin-bottom:24px;">
+
+    
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Upcoming Posts</span>
+            <a href="/posts?status=scheduled" class="btn btn-secondary btn-sm">View all</a>
+        </div>
+        {% if upcoming %}
+        <div class="table-wrap">
+            <table>
+                {% for post in upcoming %}
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <span class="platform-pill">
+                                <i class="{{ post.platform|platform_icon }}" style="color:{{ post.platform|platform_color }}"></i>
+                                {{ post.platform|title }}
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="truncate" style="max-width:160px;font-weight:500;color:var(--text-primary)">{{ post.title }}</div>
+                        <div class="text-sm text-muted truncate" style="max-width:160px">{{ post.account_name }}</div>
+                    </td>
+                    <td style="white-space:nowrap;font-size:12px;color:var(--text-muted)">
+                        {{ post.scheduled_at|date('M j, H:i') }}
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-calendar-times"></i>
+            <h3>No upcoming posts</h3>
+            <p>Schedule your first post to see it here</p>
+            <a href="/posts/create" class="btn btn-primary btn-sm">Create Post</a>
+        </div>
+        {% endif %}
+    </div>
+
+    
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">Connected Accounts</span>
+            <a href="/accounts/create" class="btn btn-secondary btn-sm"><i class="fas fa-plus"></i> Connect</a>
+        </div>
+        {% if accounts %}
+        <div class="table-wrap">
+            <table>
+                {% for acc in accounts|slice(0, 6) %}
+                <tr>
+                    <td>
+                        <div style="display:flex;align-items:center;gap:10px;">
+                            <div style="width:34px;height:34px;border-radius:50%;background:{{ acc.platform|platform_color }}22;display:flex;align-items:center;justify-content:center;">
+                                <i class="{{ acc.platform|platform_icon }}" style="color:{{ acc.platform|platform_color }};font-size:14px;"></i>
+                            </div>
+                            <div>
+                                <div style="font-weight:500;color:var(--text-primary);font-size:13px;">{{ acc.account_name }}</div>
+                                <div style="font-size:11px;color:var(--text-muted);">{{ acc.platform|title }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="text-align:right;">
+                        <div style="font-weight:600;font-size:14px;">{{ acc.followers_count|number_format }}</div>
+                        <div style="font-size:11px;color:var(--text-muted);">followers</div>
+                    </td>
+                    <td>
+                        <span class="badge {% if acc.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+                            {{ acc.is_active ? 'Active' : 'Inactive' }}
+                        </span>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <i class="fas fa-share-alt"></i>
+            <h3>No accounts yet</h3>
+            <p>Connect your social media accounts</p>
+            <a href="/accounts/create" class="btn btn-primary btn-sm">Connect Account</a>
+        </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">Recent Activity</span>
+        <a href="/posts" class="btn btn-secondary btn-sm">All posts</a>
+    </div>
+    {% if recentActivity %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Post</th>
+                    <th>Platform</th>
+                    <th>Status</th>
+                    <th>Engagement</th>
+                    <th>Updated</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for post in recentActivity %}
+            <tr>
+                <td>
+                    <div style="font-weight:500;color:var(--text-primary);max-width:200px;" class="truncate">{{ post.title }}</div>
+                    <div class="text-sm text-muted truncate" style="max-width:200px">{{ post.content|slice(0,60) }}...</div>
+                </td>
+                <td>
+                    <span class="platform-pill">
+                        <i class="{{ post.platform|platform_icon }}" style="color:{{ post.platform|platform_color }}"></i>
+                        {{ post.platform|title }}
+                    </span>
+                </td>
+                <td><span class="badge {{ post.status|status_badge }}">{{ post.status|title }}</span></td>
+                <td>
+                    <span style="font-size:12px;color:var(--text-muted)">
+                        <i class="fas fa-heart" style="color:#ef4444;margin-right:4px;"></i>{{ post.likes_count }}
+                        <i class="fas fa-comment" style="color:#6366f1;margin-left:8px;margin-right:4px;"></i>{{ post.comments_count }}
+                    </span>
+                </td>
+                <td class="text-muted text-sm" style="white-space:nowrap;">{{ post.updated_at|time_ago }}</td>
+                <td>
+                    <div style="display:flex;gap:6px;">
+                        <a href="/posts/{{ post.id }}/edit" class="btn btn-secondary btn-icon btn-sm" title="Edit">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                        <form action="/posts/{{ post.id }}/delete" method="POST" style="display:inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-danger btn-icon btn-sm" data-confirm="Delete this post?" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        <h3>No posts yet</h3>
+        <p>Create your first post to get started</p>
+        <a href="/posts/create" class="btn btn-primary">Create Post</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

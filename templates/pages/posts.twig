@@ -1,0 +1,163 @@
+{% extends 'layouts/app.twig' %}
+
+{% block title %}Posts{% endblock %}
+{% block page_title %}Posts{% endblock %}
+
+{% block content %}
+
+<div class="stats-grid" style="grid-template-columns:repeat(5,1fr);">
+    <div class="stat-card">
+        <div class="stat-value">{{ stats.total ?? 0 }}</div>
+        <div class="stat-label">Total</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color:#22c55e">{{ stats.published ?? 0 }}</div>
+        <div class="stat-label">Published</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color:var(--accent)">{{ stats.scheduled ?? 0 }}</div>
+        <div class="stat-label">Scheduled</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color:var(--text-muted)">{{ stats.drafts ?? 0 }}</div>
+        <div class="stat-label">Drafts</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value" style="color:#ef4444">{{ stats.failed ?? 0 }}</div>
+        <div class="stat-label">Failed</div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body" style="padding:16px 24px;">
+        <form action="/posts" method="GET" style="display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;">
+            <div style="flex:1;min-width:200px;">
+                <input type="text" name="q" value="{{ filters.search }}" placeholder="Search posts..." class="form-control" style="margin:0;">
+            </div>
+            <div>
+                <select name="status" class="form-control" style="margin:0;width:auto;">
+                    <option value="">All Statuses</option>
+                    {% for s in statuses %}
+                    <option value="{{ s }}" {% if filters.status == s %}selected{% endif %}>{{ s|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div>
+                <select name="platform" class="form-control" style="margin:0;width:auto;">
+                    <option value="">All Platforms</option>
+                    {% for p in platforms %}
+                    <option value="{{ p }}" {% if filters.platform == p %}selected{% endif %}>{{ p|title }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-search"></i> Filter</button>
+            <a href="/posts" class="btn btn-secondary">Clear</a>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">{{ pagination.total ?? 0 }} Posts</span>
+        <a href="/posts/create" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> New Post</a>
+    </div>
+
+    {% if posts %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Post</th>
+                    <th>Platform</th>
+                    <th>Account</th>
+                    <th>Status</th>
+                    <th>Scheduled</th>
+                    <th>Engagement</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for post in posts %}
+            <tr>
+                <td style="max-width:250px;">
+                    <div style="font-weight:500;color:var(--text-primary);" class="truncate">{{ post.title }}</div>
+                    <div class="text-sm text-muted truncate">{{ post.content|slice(0,70) }}{% if post.content|length > 70 %}...{% endif %}</div>
+                </td>
+                <td>
+                    {% if post.platform %}
+                    <span class="platform-pill">
+                        <i class="{{ post.platform|platform_icon }}" style="color:{{ post.platform|platform_color }}"></i>
+                        {{ post.platform|title }}
+                    </span>
+                    {% else %}
+                    <span class="text-muted text-sm">—</span>
+                    {% endif %}
+                </td>
+                <td class="text-sm text-muted">{{ post.account_name ?? '—' }}</td>
+                <td><span class="badge {{ post.status|status_badge }}">{{ post.status|title }}</span></td>
+                <td class="text-sm text-muted" style="white-space:nowrap;">
+                    {% if post.scheduled_at %}
+                        {{ post.scheduled_at|date('M j, Y H:i') }}
+                    {% else %}
+                        <span style="color:var(--text-muted)">—</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div style="display:flex;gap:12px;font-size:12px;color:var(--text-muted);">
+                        <span><i class="fas fa-heart" style="color:#ef4444"></i> {{ post.likes_count }}</span>
+                        <span><i class="fas fa-comment" style="color:var(--accent)"></i> {{ post.comments_count }}</span>
+                    </div>
+                </td>
+                <td>
+                    <div style="display:flex;gap:6px;">
+                        <a href="/posts/{{ post.id }}/edit" class="btn btn-secondary btn-icon btn-sm" title="Edit">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                        <form action="/posts/{{ post.id }}/delete" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-danger btn-icon btn-sm" data-confirm="Delete this post permanently?" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    
+    {% if pagination.last_page > 1 %}
+    <div class="pagination">
+        <a href="?page={{ pagination.page - 1 }}&status={{ filters.status }}&platform={{ filters.platform }}&q={{ filters.search }}"
+           class="page-link {% if pagination.page <= 1 %}disabled{% endif %}">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        {% for p in range(1, pagination.last_page) %}
+            {% if p >= pagination.page - 2 and p <= pagination.page + 2 %}
+            <a href="?page={{ p }}&status={{ filters.status }}&platform={{ filters.platform }}&q={{ filters.search }}"
+               class="page-link {% if p == pagination.page %}active{% endif %}">{{ p }}</a>
+            {% endif %}
+        {% endfor %}
+        <a href="?page={{ pagination.page + 1 }}&status={{ filters.status }}&platform={{ filters.platform }}&q={{ filters.search }}"
+           class="page-link {% if pagination.page >= pagination.last_page %}disabled{% endif %}">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        <span style="margin-left:auto;font-size:12px;color:var(--text-muted);">
+            Page {{ pagination.page }} of {{ pagination.last_page }}
+        </span>
+    </div>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-pencil-alt"></i>
+        <h3>No posts found</h3>
+        <p>{% if filters.search or filters.status %}Try adjusting your filters{% else %}Create your first post to get started{% endif %}</p>
+        <a href="/posts/create" class="btn btn-primary">Create Post</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}

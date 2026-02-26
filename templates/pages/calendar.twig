@@ -1,0 +1,123 @@
+{% extends 'layouts/app.twig' %}
+
+{% block title %}Content Calendar{% endblock %}
+{% block page_title %}Content Calendar{% endblock %}
+
+{% block content %}
+
+<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+    <div style="display:flex;align-items:center;gap:12px;">
+        {% set prevMonth = month|date_modify('-1 month', 'Y-m') %}
+        {% set nextMonth = month|date_modify('+1 month', 'Y-m') %}
+        <a href="/calendar?month={{ month|date_modify('-1 month')|date('Y-m') }}" class="btn btn-secondary btn-icon">
+            <i class="fas fa-chevron-left"></i>
+        </a>
+        <h2 style="font-family:'Syne',sans-serif;font-size:20px;font-weight:700;min-width:180px;text-align:center;">
+            {{ month|date('F Y') }}
+        </h2>
+        <a href="/calendar?month={{ month|date_modify('+1 month')|date('Y-m') }}" class="btn btn-secondary btn-icon">
+            <i class="fas fa-chevron-right"></i>
+        </a>
+        <a href="/calendar" class="btn btn-secondary btn-sm">Today</a>
+    </div>
+    <a href="/posts/create" class="btn btn-primary"><i class="fas fa-plus"></i> New Post</a>
+</div>
+
+{% set firstDay = month ~ '-01' %}
+{% set daysInMonth = firstDay|date('t') %}
+{% set startDow = firstDay|date('N')|number_format % 7 %}
+
+<div class="card">
+    
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);border-bottom:1px solid var(--border);">
+        {% for day in ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'] %}
+        <div style="padding:12px 8px;text-align:center;font-size:12px;font-weight:600;letter-spacing:0.5px;color:var(--text-muted);text-transform:uppercase;">
+            {{ day }}
+        </div>
+        {% endfor %}
+    </div>
+
+    
+    <div style="display:grid;grid-template-columns:repeat(7,1fr);">
+        
+        {% for i in 0..startDow-1 %}
+        <div style="min-height:100px;border-right:1px solid var(--border);border-bottom:1px solid var(--border);padding:8px;background:var(--bg-base);opacity:0.4;"></div>
+        {% endfor %}
+
+        {% for dayNum in 1..daysInMonth %}
+            {% set dateStr = month ~ '-' ~ dayNum|format('%02d') %}
+            {% set today = 'now'|date('Y-m-d') %}
+            {% set isToday = dateStr == today %}
+
+            
+            {% set dayPosts = [] %}
+            {% for post in posts %}
+                {% set postDate = post.scheduled_at ? post.scheduled_at|date('Y-m-d') : post.created_at|date('Y-m-d') %}
+                {% if postDate == dateStr %}
+                    {% set dayPosts = dayPosts|merge([post]) %}
+                {% endif %}
+            {% endfor %}
+
+            <div style="
+                min-height:100px;
+                border-right:1px solid var(--border);
+                border-bottom:1px solid var(--border);
+                padding:8px;
+                {% if isToday %}background:rgba(var(--accent-rgb),0.04);{% endif %}
+                vertical-align:top;
+            ">
+                <div style="
+                    width:26px;height:26px;
+                    border-radius:50%;
+                    display:flex;align-items:center;justify-content:center;
+                    font-size:13px;font-weight:{{ isToday ? '700' : '400' }};
+                    margin-bottom:6px;
+                    {% if isToday %}background:var(--accent);color:white;{% else %}color:var(--text-secondary);{% endif %}
+                ">{{ dayNum }}</div>
+
+                {% for post in dayPosts|slice(0,3) %}
+                <a href="/posts/{{ post.id }}/edit" style="
+                    display:block;
+                    padding:3px 6px;
+                    border-radius:5px;
+                    font-size:11px;
+                    margin-bottom:2px;
+                    text-decoration:none;
+                    overflow:hidden;
+                    white-space:nowrap;
+                    text-overflow:ellipsis;
+                    background:{{ post.platform|platform_color }}22;
+                    color:{{ post.platform|platform_color }};
+                    border-left:2px solid {{ post.platform|platform_color }};
+                " title="{{ post.title }}">
+                    {% if post.scheduled_at %}{{ post.scheduled_at|date('H:i') }} {% endif %}{{ post.title }}
+                </a>
+                {% endfor %}
+
+                {% if dayPosts|length > 3 %}
+                <div style="font-size:10px;color:var(--text-muted);padding:2px 6px;">+{{ dayPosts|length - 3 }} more</div>
+                {% endif %}
+            </div>
+
+            
+            {% if (startDow + dayNum) % 7 == 0 %}
+            <div style="grid-column:1/-1;"></div>
+            {% endif %}
+        {% endfor %}
+    </div>
+</div>
+
+<div style="display:flex;gap:16px;flex-wrap:wrap;margin-top:16px;">
+    {% set seenPlatforms = [] %}
+    {% for post in posts %}
+        {% if post.platform not in seenPlatforms %}
+            {% set seenPlatforms = seenPlatforms|merge([post.platform]) %}
+            <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-secondary);">
+                <div style="width:12px;height:12px;border-radius:3px;background:{{ post.platform|platform_color }};"></div>
+                {{ post.platform|title }}
+            </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+{% endblock %}

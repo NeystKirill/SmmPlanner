@@ -1,0 +1,126 @@
+{% extends 'layouts/app.twig' %}
+
+{% block title %}{{ account ? 'Edit Account' : 'Connect Account' }}{% endblock %}
+{% block page_title %}{{ account ? 'Edit Account' : 'Connect Social Account' }}{% endblock %}
+
+{% block content %}
+
+<div style="max-width:600px;">
+    <div class="card">
+        <div class="card-header">
+            <span class="card-title">{{ account ? 'Edit Account' : 'Connect New Account' }}</span>
+            <a href="/accounts" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Back</a>
+        </div>
+        <div class="card-body">
+
+            
+            {% if not account %}
+            <div style="margin-bottom:24px;">
+                <label class="form-label">Choose Platform</label>
+                <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;" id="platform-grid">
+                    {% set platform_colors = {
+                        instagram: '#E1306C', facebook: '#1877F2', twitter: '#1DA1F2',
+                        tiktok: '#000000', vk: '#4A76A8', telegram: '#0088CC', youtube: '#FF0000'
+                    } %}
+                    {% for p in platforms %}
+                    <label class="platform-select-btn" data-platform="{{ p }}" style="
+                        display:flex;flex-direction:column;align-items:center;gap:8px;
+                        padding:14px 10px;border-radius:12px;cursor:pointer;
+                        border:2px solid var(--border);background:var(--bg-elevated);
+                        transition:all 0.15s;text-align:center;
+                    ">
+                        <i class="{{ p|platform_icon }}" style="font-size:22px;color:{{ p|platform_color }}"></i>
+                        <span style="font-size:12px;font-weight:600;">{{ p|title }}</span>
+                        <input type="radio" name="platform_pick" value="{{ p }}" style="display:none">
+                    </label>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <form action="{{ account ? '/accounts/' ~ account.id ~ '/edit' : '/accounts/create' }}" method="POST">
+                <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+                {% if account %}
+                <div class="form-group">
+                    <label class="form-label">Platform</label>
+                    <select name="platform" class="form-control">
+                        {% for p in platforms %}
+                        <option value="{{ p }}" {% if account.platform == p %}selected{% endif %}>{{ p|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% else %}
+                <input type="hidden" name="platform" id="platform-input" value="">
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label">Account Name / Handle *</label>
+                    <input type="text" name="account_name" class="form-control {% if errors.account_name is defined %}error{% endif %}"
+                           value="{{ account.account_name ?? '' }}" placeholder="@yourbrand" required>
+                    {% if errors.account_name is defined %}<div class="form-error">{{ errors.account_name }}</div>{% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Profile URL</label>
+                    <input type="url" name="account_url" class="form-control"
+                           value="{{ account.account_url ?? '' }}" placeholder="https://instagram.com/yourbrand">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Followers Count</label>
+                    <input type="number" name="followers_count" class="form-control" min="0"
+                           value="{{ account.followers_count ?? 0 }}">
+                </div>
+
+                {% if account %}
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+                        <input type="checkbox" name="is_active" {% if account.is_active %}checked{% endif %}
+                               style="width:16px;height:16px;accent-color:var(--accent)">
+                        <span class="form-label" style="margin:0;">Active account</span>
+                    </label>
+                </div>
+                {% endif %}
+
+                <div class="form-group">
+                    <label class="form-label">Access Token <span style="color:var(--text-muted);font-weight:400;">(optional)</span></label>
+                    <input type="text" name="access_token" class="form-control"
+                           value="{{ account.access_token ?? '' }}" placeholder="API access token...">
+                    <div style="font-size:11px;color:var(--text-muted);margin-top:4px;">
+                        Used for automatic posting via platform API
+                    </div>
+                </div>
+
+                <div style="display:flex;gap:12px;justify-content:flex-end;">
+                    <a href="/accounts" class="btn btn-secondary">Cancel</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-{{ account ? 'save' : 'link' }}"></i>
+                        {{ account ? 'Save Changes' : 'Connect Account' }}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const btns = document.querySelectorAll('.platform-select-btn');
+const input = document.getElementById('platform-input');
+
+btns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        btns.forEach(b => {
+            b.style.borderColor = 'var(--border)';
+            b.style.background = 'var(--bg-elevated)';
+        });
+        btn.style.borderColor = 'var(--accent)';
+        btn.style.background = 'rgba(var(--accent-rgb),0.08)';
+        if (input) input.value = btn.dataset.platform;
+    });
+});
+</script>
+{% endblock %}

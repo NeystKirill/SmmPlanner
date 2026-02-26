@@ -1,0 +1,106 @@
+{% extends 'layouts/app.twig' %}
+
+{% block title %}Social Accounts{% endblock %}
+{% block page_title %}Social Accounts{% endblock %}
+
+{% block content %}
+
+{% if platformStats %}
+<div class="stats-grid" style="grid-template-columns:repeat(auto-fill,minmax(160px,1fr));margin-bottom:24px;">
+    {% for stat in platformStats %}
+    <div class="stat-card" style="padding:16px;">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+            <i class="{{ stat.platform|platform_icon }}" style="font-size:18px;color:{{ stat.platform|platform_color }}"></i>
+            <span style="font-family:'Syne',sans-serif;font-weight:700;font-size:13px;">{{ stat.platform|title }}</span>
+        </div>
+        <div class="stat-value" style="font-size:22px;">{{ stat.followers|number_format }}</div>
+        <div class="stat-label">{{ stat.count }} account{{ stat.count != 1 ? 's' }}</div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="card-header">
+        <span class="card-title">{{ accounts|length }} Connected Account{{ accounts|length != 1 ? 's' }}</span>
+        <a href="/accounts/create" class="btn btn-primary btn-sm"><i class="fas fa-plus"></i> Connect Account</a>
+    </div>
+
+    {% if accounts %}
+    <div class="table-wrap">
+        <table>
+            <thead>
+                <tr>
+                    <th>Account</th>
+                    <th>Platform</th>
+                    <th>Followers</th>
+                    <th>Posts</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for acc in accounts %}
+            <tr>
+                <td>
+                    <div style="display:flex;align-items:center;gap:12px;">
+                        <div style="width:40px;height:40px;border-radius:50%;background:{{ acc.platform|platform_color }}22;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+                            <i class="{{ acc.platform|platform_icon }}" style="color:{{ acc.platform|platform_color }};font-size:16px;"></i>
+                        </div>
+                        <div>
+                            <div style="font-weight:600;color:var(--text-primary);">{{ acc.account_name }}</div>
+                            {% if acc.account_url %}
+                            <a href="{{ acc.account_url }}" target="_blank" style="font-size:12px;color:var(--accent);text-decoration:none;">
+                                {{ acc.account_url|slice(0,40) }}{% if acc.account_url|length > 40 %}...{% endif %}
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <span class="platform-pill">
+                        <i class="{{ acc.platform|platform_icon }}" style="color:{{ acc.platform|platform_color }}"></i>
+                        {{ acc.platform|title }}
+                    </span>
+                </td>
+                <td>
+                    <span style="font-weight:600;">{{ acc.followers_count|number_format }}</span>
+                    <div style="font-size:11px;color:var(--text-muted);">following: {{ acc.following_count }}</div>
+                </td>
+                <td style="font-weight:500;">{{ acc.posts_count ?? 0 }}</td>
+                <td>
+                    <span class="badge {% if acc.is_active %}badge-success{% else %}badge-secondary{% endif %}">
+                        <i class="fas fa-circle" style="font-size:6px;"></i>
+                        {{ acc.is_active ? 'Active' : 'Inactive' }}
+                    </span>
+                </td>
+                <td>
+                    <div style="display:flex;gap:6px;">
+                        <a href="/accounts/{{ acc.id }}/edit" class="btn btn-secondary btn-icon btn-sm" title="Edit">
+                            <i class="fas fa-pen"></i>
+                        </a>
+                        <form action="/accounts/{{ acc.id }}/delete" method="POST">
+                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+                            <button class="btn btn-danger btn-icon btn-sm"
+                                    data-confirm="Remove {{ acc.account_name }}? This will affect related posts." title="Delete">
+                                <i class="fas fa-unlink"></i>
+                            </button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-share-alt"></i>
+        <h3>No accounts connected</h3>
+        <p>Connect your Instagram, Facebook, Twitter and other accounts to start planning</p>
+        <a href="/accounts/create" class="btn btn-primary">Connect Account</a>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
